@@ -112,8 +112,8 @@ $investors = $conn->query($inv_sql);
               $ps = $rp['ps'];
               $pe = $rp['pe'];
 
-              $q_in = "SELECT IFNULL(SUM(CASE WHEN amount>0 THEN amount ELSE 0 END),0) AS masuk,
-                              IFNULL(SUM(CASE WHEN amount<0 THEN -amount ELSE 0 END),0) AS keluar
+              $q_in = "SELECT IFNULL(SUM(CASE WHEN trans_type = 'masuk' THEN amount ELSE 0 END),0) AS masuk,
+                              IFNULL(SUM(CASE WHEN trans_type = 'keluar' THEN -amount ELSE 0 END),0) AS keluar
                        FROM transactions
                        WHERE investment_id = $iid
                          AND trans_date BETWEEN '$ps' AND '$pe'";
@@ -121,8 +121,8 @@ $investors = $conn->query($inv_sql);
               $masuk = (float)$rtrans['masuk'];
               $keluar = (float)$rtrans['keluar'];
 
-              $q_before = "SELECT IFNULL(SUM(CASE WHEN amount>0 THEN amount ELSE 0 END),0) AS masuk_before,
-                                  IFNULL(SUM(CASE WHEN amount<0 THEN -amount ELSE 0 END),0) AS keluar_before
+              $q_before = "SELECT IFNULL(SUM(CASE WHEN trans_type = 'masuk' THEN amount ELSE 0 END),0) AS masuk_before,
+                                  IFNULL(SUM(CASE WHEN trans_type = 'keluar' THEN -amount ELSE 0 END),0) AS keluar_before
                            FROM transactions
                            WHERE investment_id = $iid
                              AND trans_date < '$ps'";
@@ -154,8 +154,8 @@ $investors = $conn->query($inv_sql);
                     </tr>";
 
               if ($p == 3) {
-                 $tot_masuk_all_q = $conn->query("SELECT IFNULL(SUM(CASE WHEN amount>0 THEN amount ELSE 0 END),0) AS m FROM transactions WHERE investment_id=$iid AND trans_date BETWEEN ".$periods[0]['start_expr']." AND ".$periods[3]['end_expr'])->fetch_assoc()['m'];
-                  $tot_keluar_all_q = $conn->query("SELECT IFNULL(SUM(CASE WHEN amount<0 THEN -amount ELSE 0 END),0) AS k FROM transactions WHERE investment_id=$iid AND trans_date BETWEEN ".$periods[0]['start_expr']." AND ".$periods[3]['end_expr'])->fetch_assoc()['k'];
+                  $tot_masuk_all_q = $conn->query("SELECT IFNULL(SUM(CASE WHEN trans_type = 'masuk' THEN amount ELSE 0 END),0) AS m FROM transactions WHERE investment_id=$iid AND trans_date BETWEEN ".$periods[0]['start_expr']." AND ".$periods[3]['end_expr'])->fetch_assoc()['m'];
+                  $tot_keluar_all_q = $conn->query("SELECT IFNULL(SUM(CASE WHEN trans_type = 'keluar' THEN -amount ELSE 0 END),0) AS k FROM transactions WHERE investment_id=$iid AND trans_date BETWEEN ".$periods[0]['start_expr']." AND ".$periods[3]['end_expr'])->fetch_assoc()['k'];
                   $agg_total_akhir = $principal + $tot_masuk_all_q - $tot_keluar_all_q + $inv_tot_bunga;
                   $chart_labels[] = $name;
                   $chart_values[] = (float)$agg_total_akhir;
