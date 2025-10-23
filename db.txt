@@ -1,0 +1,21 @@
+CREATE TABLE investments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    investor_name VARCHAR(100),
+    start_date DATE,
+    principal DECIMAL(15,2),
+    annual_interest DECIMAL(5,2) DEFAULT 15.00,
+    period_months INT DEFAULT 3,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE transactions 
+CREATE TABLE transactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    investment_id INT,
+    trans_date DATE,
+    DESCRIPTION VARCHAR(255),
+    amount DECIMAL(15,2),
+    FOREIGN KEY (investment_id) REFERENCES investments(id)
+);
+
+ADD COLUMN trans_type ENUM('masuk', 'keluar') AFTER DESCRIPTION;
